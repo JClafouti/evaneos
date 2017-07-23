@@ -2,7 +2,7 @@
 
 class TemplateManager
 {
-    const QUOTE_VAR_PATTERN = '[quote:%var%]';
+    const VAR_PATTERN = '[%var%]';
     
     /**
     *
@@ -23,9 +23,9 @@ class TemplateManager
     /**
     *
     */
-    private function replaceQuoteVar($text, $var, $value)
+    private function replaceTemplateVar($text, $var, $value)
     {
-        $var = str_replace('%var%', $var, self::QUOTE_VAR_PATTERN);
+        $var = str_replace('%var%', $var, self::VAR_PATTERN);
         
         if(strpos($text, $var) !== false) {
             $text = str_replace($var, $value, $text);
@@ -54,30 +54,29 @@ class TemplateManager
             }
             
             // replace summary_html
-            $text = $this->replaceQuoteVar($text, 'summary_html', Quote::renderHtml($_quoteFromRepository));
+            $text = $this->replaceTemplateVar($text, 'quote:summary_html', Quote::renderHtml($_quoteFromRepository));
 
             // replace summary
-            $text = $this->replaceQuoteVar($text, 'summary', Quote::renderText($_quoteFromRepository));
+            $text = $this->replaceTemplateVar($text, 'quote:summary', Quote::renderText($_quoteFromRepository));
             
             // replace detination name
-            $text = $this->replaceQuoteVar($text, 'destination_name', $destinationOfQuote->countryName);
+            $text = $this->replaceTemplateVar($text, 'quote:destination_name', $destinationOfQuote->countryName);
             
         }
 
         // replace destination link
-        $text = $this->replaceQuoteVar($text, 'destination_link', '');
+        $text = $this->replaceTemplateVar($text, 'quote:destination_link', '');
 
         if (isset($destination))
-            $text = $this->replaceQuoteVar($text, 'destination_link', $usefulObject->url . '/' . $destination->countryName . '/quote/' . $_quoteFromRepository->id);        
+            $text = $this->replaceTemplateVar($text, 'quote:destination_link', $usefulObject->url . '/' . $destination->countryName . '/quote/' . $_quoteFromRepository->id);        
                    
 
         /*
-         * USER
-         * [user:*]
+         * replace user first name
          */
         $_user  = (isset($data['user'])  and ($data['user']  instanceof User))  ? $data['user']  : $APPLICATION_CONTEXT->getCurrentUser();
         if($_user) {
-            (strpos($text, '[user:first_name]') !== false) and $text = str_replace('[user:first_name]'       , ucfirst(mb_strtolower($_user->firstname)), $text);
+            $text = $this->replaceTemplateVar($text, 'user:first_name', ucfirst(mb_strtolower($_user->firstname)));
         }
 
         return $text;
