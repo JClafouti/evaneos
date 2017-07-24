@@ -5,14 +5,12 @@ class TemplateManager
     const VAR_PATTERN = '[%var%]';
     
     /**
-    *
+    * @var Template tpl // Template object 
+    * @var array Data // Array containing template data
+    * @return Template object
     */
     public function getTemplateComputed(Template $tpl, array $data)
-    {
-        if (!$tpl) {
-            throw new \RuntimeException('no tpl given');
-        }
-
+    {        
         $replaced = clone($tpl);
         $replaced->subject = $this->computeText($replaced->subject, $data);
         $replaced->content = $this->computeText($replaced->content, $data);
